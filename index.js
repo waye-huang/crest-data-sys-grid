@@ -128,7 +128,7 @@ class BoxGrid {
 window.addEventListener('DOMContentLoaded', () => {
   boxGrid = new BoxGrid('box-grid');
 	//set default column count to 4, this is for browser opening up app for 1st time
-	const localColCount = localStorage.getItem('col-count') || 4;
+	let localColCount = localStorage.getItem('col-count') || 4;
 	boxGrid.setColumns(localColCount);
 	document.getElementById('')
 	document.getElementById('col').getElementsByTagName('option')[localColCount - 1].selected = 'selected';
