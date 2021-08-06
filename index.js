@@ -1,87 +1,120 @@
-
-function btnToggle() {
-	document.getElementById("Dropdown").classList.toggle("show");
-}
-
-// Prevents menu from closing when clicked inside
-document.getElementById("add-box").addEventListener('click', function (event) {
-	addBox2();
-	event.stopPropagation();
-});
-
-document.getElementById("reset").addEventListener('click', function (event) {
-	resetBoxGrid();
-	event.stopPropagation();
-});
-
-// Closes the menu in the event of outside click
-window.onclick = function(event) {
-	if (!event.target.matches('.dropbutton')) {
-		
-			var dropdowns = 
-			document.getElementsByClassName("dropdownmenu-content");
-				
-			var i;
-			for (i = 0; i < dropdowns.length; i++) {
-					var openDropdown = dropdowns[i];
-					if (openDropdown.classList.contains('show')) {
-							openDropdown.classList.remove('show');
-					}
-			}
-	}
-}
-
-const boxGrid = document.getElementById('box-grid');
-
 class Box {
 	constructor(idx) {
-		const boxId = `box-${idx}`;
-
+		
 		this.node = document.createElement('div');
 		this.node.setAttribute('class', 'grid-box');
+		const boxId = `box-${idx}`;
 		this.node.setAttribute('id', boxId);
 		this.node.innerText = idx;
 		this.id = boxId;
-
+		
+		this.removeBox = this.removeBox.bind(this);
 		const delBtn = document.createElement('button');
 		delBtn.setAttribute('class', 'del');
 		delBtn.innerHTML = 'X';
-		// delBtn.addEventListener('click', () => console.log(boxId));
-		delBtn.addEventListener('click', () => this.removeBox(boxId));
-	
+		delBtn.addEventListener('click', () => this.removeBox(this.id));
+
 		this.node.appendChild(delBtn);
-		// this.addBox.bind(this);
-		// this.removeBox.bind(this);
-		// this.print.bind(this);
 	}
 
 	addBox() {
-		const boxGrid = document.getElementById('box-grid');
-		boxGrid.appendChild(this.node);
-		console.log(`${this.id} added!`)
+		const bxGrid = document.getElementById('box-grid');
+		bxGrid.appendChild(this.node);
+		console.log(`${this.id} added.`)
 	}
 
-  print() {
-		console.log('printing!!!')
-	}
-
-	removeBox(boxId) {
-		const boxToDelete = document.getElementById(boxId);
-		console.log('boxToDelete', boxToDelete)
-		const boxGrid = document.getElementById('box-grid');
-		boxGrid.removeChild(boxToDelete);
+	removeBox(id) {
+		const boxToDelete = document.getElementById(id);
+		const bxGrid = document.getElementById('box-grid');
+		bxGrid.removeChild(boxToDelete);
+		console.log(`${this.id} deleted.`)
 	}
 }
 
-function addBox2() {
-	const boxGrid = document.getElementById('box-grid');
-	let currentIndex = boxGrid.children.length + 1;
-	let box=new Box(currentIndex);
-	box.addBox();
+class BoxGrid {
+	constructor(id) {
+		this.node = document.getElementById(id);
+		this.col = 4;
+	}
+
+	addBox() {
+		let currentIndex = this.node.children.length + 1;
+		let currentBox=new Box(currentIndex);
+		currentBox.addBox();
+	}
+
+	setColumns(val) {
+		this.col = val;
+	}
+	
+	addRow() {
+		for (let step = 0; step < this.col; step++){
+			this.addBox();
+		} 
+	}
+
+	resetGrid() {
+		this.node.innerHTML = '';
+		console.log(`grid is now reset!`)
+	}
+	
+	removeRow() {
+		const children = this.node.children;
+		if (!children.length) console.log('Grid is empty, add a box!');
+		else if (children.length >= this.col){
+			for (let step = 0; step < this.col; step++){
+				this.node.removeChild(this.node.lastChild);
+				console.log(`row is deleted.`)
+			} 
+		} else {
+			this.node.removeChild(this.node.lastChild);
+			console.log(`one of last row is deleted.`)
+		}
+	}
 }
 
 
-function resetBoxGrid() {
-	// alert('reset BoxGrid button fired!');
-	boxGrid.innerHTML = '';
-}
+window.addEventListener('DOMContentLoaded', () => {
+  boxGrid = new BoxGrid('box-grid');
+
+	document.getElementById("add-box").addEventListener('click', (event)=> {
+		boxGrid.addBox(); event.stopPropagation();
+
+	});
+
+	document.getElementById('col').getElementsByTagName('option')[3].selected = 'selected';
+
+	document.getElementById("col").addEventListener('change', (event)=> {
+		event.stopPropagation(); 
+		const colCount = document.getElementById('col').value; 
+		const newFormat = '1fr '.repeat(colCount);
+		document.getElementById('box-grid').style.gridTemplateColumns = newFormat;
+		boxGrid.setColumns(colCount);
+		console.log(`setColumns to ${colCount}`)
+	});
+	
+	document.getElementById("add-row").addEventListener('click', (event)=> {
+		boxGrid.addRow();	event.stopPropagation();
+	});
+	
+	document.getElementById("del-row").addEventListener('click', (event)=> {
+		boxGrid.removeRow(); event.stopPropagation();
+	});
+	
+	document.getElementById("reset").addEventListener('click', (event)=> {
+		boxGrid.resetGrid(); event.stopPropagation();
+	});
+	
+	window.onclick = function(event) {
+		if (!event.target.matches('.dropbutton')) {
+				let dropdowns = 
+				document.getElementsByClassName("dropdownmenu-content");
+				for (let i = 0; i < dropdowns.length; i++) {
+						let openDropdown = dropdowns[i];
+						if (openDropdown.classList.contains('show')) {
+								openDropdown.classList.remove('show');
+						}
+				}
+		}
+	}
+});

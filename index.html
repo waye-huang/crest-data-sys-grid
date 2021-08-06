@@ -10,28 +10,52 @@
 </head>
 
 <body>
+	<div class="navbar">
+		<h1>DataSystem TakeHome
+		</h1>
+		<h2>
+			Columns Grid
 
-	<h1 style="color:rgb(8, 98, 216)">DataSystem TakeHome</h1>
+			<form>
+				<select class="col-count" id='col'">
+					<option value=" 1" selected>1</option>
+					<option value="2" selected>2</option>
+					<option value="3" selected>3</option>
+					<option value="4" selected>4</option>
+					<option value="5" selected>5</option>
+					<option value="6" selected>6</option>
+					<option value="7" selected>7</option>
+					<option value="8" selected>8</option>
+					<option value="9" selected>9</option>
+					<option value="10" selected>10</option>
+				</select>
+			</form>
+		</h2>
 
-	<div class="dropdownmenu">
 
-		<button onclick="btnToggle()" class="dropbutton">
-			Box Control
-		</button>
-
-		<div id="Dropdown" class="dropdownmenu-content">
-			<button id="add-box" class="button">ADD</button>
-			<button id="reset" class="button">RESET</button>
+		<div class=" dropdownmenu">
+			<button onclick="btnToggle()" class="dropbutton">
+				Box Setting
+			</button>
+			<div id="Dropdown" class="dropdownmenu-content">
+				<button id="add-box" class="button">ADD</button>
+				<button id="reset" class="button">RESET</button>
+				<button id="add-row" class="button">+ ROW</button>
+				<button id="del-row" class="button">- ROW</button>
+			</div>
 		</div>
 	</div>
 
-
 	<div class="grid-container" id="box-grid">
-		<div class="grid-box">1</div>
-		<div class="grid-box">2</div>
-		<div class="grid-box">3</div>
 	</div>
+
+
 	<script src="./index.js"></script>
+	<script>
+		function btnToggle() {
+			document.getElementById("Dropdown").classList.toggle("show");
+		}
+	</script>
 </body>
 
 </html>
