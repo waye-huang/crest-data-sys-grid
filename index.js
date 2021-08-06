@@ -1,18 +1,21 @@
 class Box {
-	constructor(idx, parentNodeId) {
+	constructor(idx, boxName, parentNodeId) {
 		
 		this.parentNode = document.getElementById(parentNodeId);
 		this.node = document.createElement('div');
-		const newId = this.parentNode.lastChild?.idx ? this.parentNode.lastChild.idx + 1 : 0;
-		this.node.idx = Math.max(idx, newId);
+		let newIdx = this.parentNode.lastChild ? this.parentNode.lastChild.idx + 1 : 1;
+		this.lastChildIdx = Number(localStorage.getItem('lastChildIndex'));
+		// regenIdx =  Number(boxName.slice(4)) || 0;
+		this.node.idx = boxName ? (boxName ? Number(boxName.slice(4)) : 0) : newIdx;
 		
-		const boxId = `box-${this.node.idx}`;
+		// const boxId = `box-${this.node.idx}`;
+		const boxId = this.idFormat(`box`, this.node.idx, 4);
 		this.node.setAttribute('class', 'grid-box');
 		this.node.setAttribute('id', boxId);
-		
 		this.node.setAttribute('value', this.node.idx);
-		this.node.innerText = this.node.idx;
-		this.node.id = boxId;
+		// this.node.setAttribute('value', this.node.idx);
+		this.node.innerText = boxName ? Number(boxName.split('-')[1]) : this.node.idx;
+		this.node.id = boxName ? boxName : boxId;
 		
 		// this.removeBox = this.removeBox.bind(this);
 		const delBtn = document.createElement('button');
@@ -22,19 +25,31 @@ class Box {
 		this.node.appendChild(delBtn);
 	}
 
-	addBox() {
+	idFormat (name, num, size) {
+		num = num.toString();
+		while (num.length < size) num = '0' + num;
+		return `${name}-${num}`;
+	}
+
+	addBox(boxName) {
 		this.parentNode.appendChild(this.node);
 		let lastChildID = this.parentNode.lastChild.idx; 
 		localStorage.setItem('lastChildIndex', lastChildID);
-		console.log(`${this.node.id} added.`)
+		localStorage.setItem(this.node.id, this.node.idx);
+		if (boxName === undefined) {
+			console.log(`${this.node.id} added.`)
+		} else {
+			console.log(`${this.node.id} added.`)
+		}
 	}
 
 	removeBox(id) {
 		const boxToDelete = document.getElementById(id);
 		this.parentNode.removeChild(boxToDelete);
+		localStorage.removeItem(id);
 		const lastId = this.parentNode.lastChild.idx;
-		console.log(`last box on the board is: ${lastId}`)
 		localStorage.setItem('lastChildIndex', Number(lastId || 0));
+		console.log(`last box on the board is: ${lastId}`)
 		console.log(`${this.node.id} deleted. lastID: ${lastId}`)
 	}
 }
@@ -46,10 +61,10 @@ class BoxGrid {
 		this.id = id;
 	}
 
-	addBox() {
+	addBox(boxName) {
 		let currentIndex = this.node.children.length + 1;
-		let currentBox=new Box(currentIndex, this.id);
-		currentBox.addBox();
+		let currentBox = new Box(currentIndex, boxName, this.id);
+		currentBox.addBox(boxName);
 	}
 
 	addBoxes(num) {
@@ -63,10 +78,9 @@ class BoxGrid {
 	}
 	
 	updateCount() {
-		const lastId = this.node.lastChild.idx;
-		console.log(`this.node.lastChild`);
-		console.dir(this.node.lastChild);
-		localStorage.setItem('lastChildIndex', Number(lastId || 0));
+		// const lastIdx = this.node.lastChild.idx;
+		localStorage.setItem('lastChildIndex', this.node.lastChild ? this.node.lastChild.idx : 0);
+		// localStorage.setItem('lastChildIndex', this.node.lastChild ? Number(this.node.lastChild.idx) : 0);
 	}
 
 	addRow() {
@@ -80,6 +94,7 @@ class BoxGrid {
 	resetGrid() {
 		this.node.innerHTML = '';
 		localStorage.setItem('lastChildIndex', 0);
+		Object.keys(localStorage).filter(each => each.slice(0, 3) === 'box').forEach(each => localStorage.removeItem(each));
 		console.log(`grid is now reset!`)
 	}
 	
@@ -92,41 +107,63 @@ class BoxGrid {
 			let extraBoxes = children.length % this.col;
 			let delCount = extraBoxes ? extraBoxes : this.col;
 			for (let step = 0; step < delCount; step++){
+				localStorage.removeItem(this.node.lastChild.id);
 				this.node.removeChild(this.node.lastChild);
 				console.log(`row is deleted.`)
 			} 
 		} else {
+			localStorage.removeItem(this.node.lastChild.id);
 			this.node.removeChild(this.node.lastChild);
 			console.log(`one of last row is deleted.`)
 		}
 		this.updateCount();
 	}
+
+	setColumns(value) {
+		localStorage.setItem('col-count', value);
+		this.col = value;
+		// update style
+		const newFormat = '1fr '.repeat(value);
+		document.getElementById('box-grid').style.gridTemplateColumns = newFormat;
+		console.log(`setColumns to ${value}`)
+	}
+
 }
 
 
 window.addEventListener('DOMContentLoaded', () => {
   boxGrid = new BoxGrid('box-grid');
-	// read where browser last left off with boxes;
-	let browserIndex = localStorage.getItem('lastChildIndex');
-	if (isNaN(browserIndex)) localStorage.setItem('lastChildIndex', 0);
-	boxGrid.addBoxes(browserIndex || 0);
+	const localColCount = localStorage.getItem('col-count');
+	boxGrid.setColumns(localColCount);
+	document.getElementById('')
+	document.getElementById('col').getElementsByTagName('option')[localColCount - 1].selected = 'selected';
+
+	let localStorageKeys = Object.keys(localStorage).filter(each => each.slice(0, 3) === 'box');
+	localStorageKeys.sort();
+	const childrenNameList = boxGrid.children?.map(child => child.id) || [];
+	let missingKeys = localStorageKeys.filter(each => !childrenNameList.includes(each)); 
+	// console.log('restore =', missingKeys);
+
+		if (missingKeys.length){
+			for (let step = 0; step < Math.min(missingKeys.length, 300); step++) {
+					let boxId = missingKeys[step];
+					console.log(`@129 boxId: ${boxId}`);
+					boxGrid.addBox(boxId);
+					// console.log(`${boxId} restored.`);
+			}
+		}
 
 	document.getElementById("add-box").addEventListener('click', (event)=> {
 		boxGrid.addBox(); event.stopPropagation();
-		screenGrid = document.getElementById('box-grid');
-		// console.log(`screenGrid.lastChildren.value ==>`, screenGrid);
 	});
 
 	//default columns count is set to 4 with the follow line
-	document.getElementById('col').getElementsByTagName('option')[3].selected = 'selected';
-
+	
 	document.getElementById("col").addEventListener('change', (event)=> {
 		event.stopPropagation(); 
 		const colCount = document.getElementById('col').value; 
-		const newFormat = '1fr '.repeat(colCount);
-		document.getElementById('box-grid').style.gridTemplateColumns = newFormat;
 		boxGrid.setColumns(colCount);
-		console.log(`setColumns to ${colCount}`)
+		
 	});
 	
 	document.getElementById("add-row").addEventListener('click', (event)=> {
