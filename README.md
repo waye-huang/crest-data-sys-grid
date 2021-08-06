@@ -20,4 +20,5 @@ This is a multi-box generation app built with venilla javascript and css.
   - [x] - Box Retain in locale memory after browser close / refresh. 
   - [x] - Number of Boxes Retain in locale memory after browser close / refresh. 
   - [x] - Every instance of Boxes Retain in locale memory after browser close / refresh. 
+  - [ ] - Store box keys in an object in localstorage
   - [ ] - Text field in boxes
