@@ -5,19 +5,15 @@ class Box {
 		this.node = document.createElement('div');
 		let newIdx = this.parentNode.lastChild ? this.parentNode.lastChild.idx + 1 : 1;
 		this.lastChildIdx = Number(localStorage.getItem('lastChildIndex'));
-		// regenIdx =  Number(boxName.slice(4)) || 0;
 		this.node.idx = boxName ? (boxName ? Number(boxName.slice(4)) : 0) : newIdx;
 		
-		// const boxId = `box-${this.node.idx}`;
 		const boxId = this.idFormat(`box`, this.node.idx, 4);
 		this.node.setAttribute('class', 'grid-box');
 		this.node.setAttribute('id', boxId);
 		this.node.setAttribute('value', this.node.idx);
-		// this.node.setAttribute('value', this.node.idx);
 		this.node.innerText = boxName ? Number(boxName.split('-')[1]) : this.node.idx;
 		this.node.id = boxName ? boxName : boxId;
 		
-		// this.removeBox = this.removeBox.bind(this);
 		const delBtn = document.createElement('button');
 		delBtn.setAttribute('class', 'del');
 		delBtn.innerHTML = 'X';
@@ -78,9 +74,7 @@ class BoxGrid {
 	}
 	
 	updateCount() {
-		// const lastIdx = this.node.lastChild.idx;
 		localStorage.setItem('lastChildIndex', this.node.lastChild ? this.node.lastChild.idx : 0);
-		// localStorage.setItem('lastChildIndex', this.node.lastChild ? Number(this.node.lastChild.idx) : 0);
 	}
 
 	addRow() {
@@ -133,7 +127,8 @@ class BoxGrid {
 
 window.addEventListener('DOMContentLoaded', () => {
   boxGrid = new BoxGrid('box-grid');
-	const localColCount = localStorage.getItem('col-count');
+	//set default column count to 4, this is for browser opening up app for 1st time
+	const localColCount = localStorage.getItem('col-count') || 4;
 	boxGrid.setColumns(localColCount);
 	document.getElementById('')
 	document.getElementById('col').getElementsByTagName('option')[localColCount - 1].selected = 'selected';
@@ -142,14 +137,12 @@ window.addEventListener('DOMContentLoaded', () => {
 	localStorageKeys.sort();
 	const childrenNameList = boxGrid.children?.map(child => child.id) || [];
 	let missingKeys = localStorageKeys.filter(each => !childrenNameList.includes(each)); 
-	// console.log('restore =', missingKeys);
 
 		if (missingKeys.length){
 			for (let step = 0; step < Math.min(missingKeys.length, 300); step++) {
 					let boxId = missingKeys[step];
 					console.log(`@129 boxId: ${boxId}`);
 					boxGrid.addBox(boxId);
-					// console.log(`${boxId} restored.`);
 			}
 		}
 
@@ -157,13 +150,10 @@ window.addEventListener('DOMContentLoaded', () => {
 		boxGrid.addBox(); event.stopPropagation();
 	});
 
-	//default columns count is set to 4 with the follow line
-	
 	document.getElementById("col").addEventListener('change', (event)=> {
 		event.stopPropagation(); 
 		const colCount = document.getElementById('col').value; 
 		boxGrid.setColumns(colCount);
-		
 	});
 	
 	document.getElementById("add-row").addEventListener('click', (event)=> {
