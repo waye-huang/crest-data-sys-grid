@@ -17,4 +17,5 @@ This is a multi-box generation app built with venilla javascript and css.
   - [x] + Row button will first fill up an incomplete row before adding another row.
   - [x] - Row button deletes an row of button based on the column size.
   - [x] - Row button will delete the last row despite number of boxes in the row.
-  - [x] - Box Retain in locale memory after browser close / refresh. 
+  - [x] - Number of Boxes Retain in locale memory after browser close / refresh. 
+  - [ ] - Every instance of Boxes Retain in locale memory after browser close / refresh. 
