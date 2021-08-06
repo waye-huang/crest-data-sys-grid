@@ -48,7 +48,9 @@ class BoxGrid {
 	}
 	
 	addRow() {
-		for (let step = 0; step < this.col; step++){
+		let missBoxes = this.col - this.node.children.length % this.col;
+		let addCount = missBoxes ? missBoxes : this.col;
+		for (let step = 0; step < addCount; step++){
 			this.addBox();
 		} 
 	}
@@ -61,8 +63,12 @@ class BoxGrid {
 	removeRow() {
 		const children = this.node.children;
 		if (!children.length) console.log('Grid is empty, add a box!');
+		
 		else if (children.length >= this.col){
-			for (let step = 0; step < this.col; step++){
+			// when a row is not full, will first remove the button row
+			let extraBoxes = children.length % this.col;
+			let delCount = extraBoxes ? extraBoxes : this.col;
+			for (let step = 0; step < delCount; step++){
 				this.node.removeChild(this.node.lastChild);
 				console.log(`row is deleted.`)
 			} 
