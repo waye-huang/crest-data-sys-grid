@@ -15,7 +15,8 @@ class Box {
 		this.node.setAttribute('id', this.node.id);
 		this.node.setAttribute('value', this.node.idx);
 		this.node.innerText = oldBoxName ? Number(oldBoxName.slice(4)) : this.node.idx;
-		
+		this.node.addEventListener('dblclick', () => this.removeBox(this.node.id));
+	
 		function idFormat (name, num, size) {
 			num = num.toString();
 			while (num.length < size) num = '0' + num;

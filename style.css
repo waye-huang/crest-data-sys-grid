@@ -124,6 +124,8 @@ h2 {
   grid-template-columns: 1fr 1fr 1fr 1fr;
 }
 .grid-box {
+	position: relative;
+	z-index: 1;
 	margin: 5px;
 	padding: 1rem;
   background-color: white;
@@ -134,17 +136,23 @@ h2 {
 	border-radius: 10px;
 	height: 10rem;
 }
+
 .grid-box:hover {
 	box-shadow: 0px 1px 2px rgba(0,0,0,0.3);
+	/* z-index: -2; */
+}
+ 
+.grid-box:hover .del{
+  display: block;
 }
 
 .del {
-  position: relative;
+	display: none;
   float: right;
-	background-color: rgba(255, 255, 255, 0.8);
-	border: 1px solid rgba(131, 131, 131, 0.8);
+	background-color: rgba(255, 255, 255, 1);
+	border: 1px solid rgba(66, 66, 66, 1);
 	color:rgb(49, 52, 226);
-	z-index: 0;
+	z-index: 2;
 }
 
 .del:hover {
