@@ -1,19 +1,27 @@
 class Box {
-	constructor(idx, boxName, parentNodeId) {
+	constructor(idx, oldBoxName, parentNodeId) {
 		
 		this.parentNode = document.getElementById(parentNodeId);
 		this.node = document.createElement('div');
-		let newIdx = this.parentNode.lastChild ? this.parentNode.lastChild.idx + 1 : 1;
-		this.lastChildIdx = Number(localStorage.getItem('lastChildIndex'));
-		this.node.idx = boxName ? (boxName ? Number(boxName.slice(4)) : 0) : newIdx;
+
 		
-		const boxId = this.idFormat(`box`, this.node.idx, 4);
+		let newIdx = this.parentNode.children.length > 0 ? this.parentNode.lastChild.idx + 1 : 1;
+		// debugger;
+		this.node.idx = oldBoxName !== undefined ? Number(oldBoxName.slice(4)) : newIdx;
+
+		const boxName = idFormat(`box`, this.node.idx, 4);
+		this.node.id = oldBoxName ? oldBoxName : boxName;
 		this.node.setAttribute('class', 'grid-box');
-		this.node.setAttribute('id', boxId);
+		this.node.setAttribute('id', this.node.id);
 		this.node.setAttribute('value', this.node.idx);
-		this.node.innerText = boxName ? Number(boxName.split('-')[1]) : this.node.idx;
-		this.node.id = boxName ? boxName : boxId;
+		this.node.innerText = oldBoxName ? Number(oldBoxName.slice(4)) : this.node.idx;
 		
+		function idFormat (name, num, size) {
+			num = num.toString();
+			while (num.length < size) num = '0' + num;
+			return `${name}-${num}`;
+		}
+
 		const delBtn = document.createElement('button');
 		delBtn.setAttribute('class', 'del');
 		delBtn.innerHTML = 'X';
@@ -21,11 +29,6 @@ class Box {
 		this.node.appendChild(delBtn);
 	}
 
-	idFormat (name, num, size) {
-		num = num.toString();
-		while (num.length < size) num = '0' + num;
-		return `${name}-${num}`;
-	}
 
 	addBox(boxName) {
 		this.parentNode.appendChild(this.node);
@@ -35,7 +38,7 @@ class Box {
 		if (boxName === undefined) {
 			console.log(`${this.node.id} added.`)
 		} else {
-			console.log(`${this.node.id} added.`)
+			console.log(`${this.node.id} restored.`)
 		}
 	}
 
@@ -58,7 +61,7 @@ class BoxGrid {
 	}
 
 	addBox(boxName) {
-		let currentIndex = this.node.children.length + 1;
+		let currentIndex = this.node.children.length ? this.node.children.length + 1 : 1;
 		let currentBox = new Box(currentIndex, boxName, this.id);
 		currentBox.addBox(boxName);
 	}
@@ -69,10 +72,6 @@ class BoxGrid {
 		}
 	}
 
-	setColumns(val) {
-		this.col = val;
-	}
-	
 	updateCount() {
 		localStorage.setItem('lastChildIndex', this.node.lastChild ? this.node.lastChild.idx : 0);
 	}
@@ -85,13 +84,6 @@ class BoxGrid {
 		} 
 	}
 
-	resetGrid() {
-		this.node.innerHTML = '';
-		localStorage.setItem('lastChildIndex', 0);
-		Object.keys(localStorage).filter(each => each.slice(0, 3) === 'box').forEach(each => localStorage.removeItem(each));
-		console.log(`grid is now reset!`)
-	}
-	
 	removeRow() {
 		const children = this.node.children;
 		if (!children.length) console.log('Grid is empty, add a box!');
@@ -112,10 +104,18 @@ class BoxGrid {
 		}
 		this.updateCount();
 	}
+	
+	resetGrid() {
+		this.node.innerHTML = '';
+		localStorage.setItem('lastChildIndex', 0);
+		Object.keys(localStorage).filter(each => each.slice(0, 3) === 'box').forEach(each => localStorage.removeItem(each));
+		console.log(`grid is now reset!`)
+	}
 
 	setColumns(value) {
 		localStorage.setItem('col-count', value);
 		this.col = value;
+		
 		// update style
 		const newFormat = '1fr '.repeat(value);
 		document.getElementById('box-grid').style.gridTemplateColumns = newFormat;
@@ -128,7 +128,7 @@ window.addEventListener('DOMContentLoaded', () => {
 	if (localStorage.lastChildIndex === undefined) localStorage.setItem('lastChildIndex', 0);
 
 	//set default column count to 4, this is for browser opening up app for 1st time
-	let localColCount = localStorage.getItem('col-count') || 4;
+	let localColCount = localStorage.getItem('col-count') || 5;
 	boxGrid.setColumns(localColCount);
 	document.getElementById('')
 	document.getElementById('col').getElementsByTagName('option')[localColCount - 1].selected = 'selected';
@@ -141,7 +141,6 @@ window.addEventListener('DOMContentLoaded', () => {
 		if (missingKeys.length){
 			for (let step = 0; step < Math.min(missingKeys.length, 300); step++) {
 					let boxId = missingKeys[step];
-					console.log(`@129 boxId: ${boxId}`);
 					boxGrid.addBox(boxId);
 			}
 		}
