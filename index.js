@@ -125,7 +125,7 @@ class BoxGrid {
 
 window.addEventListener('DOMContentLoaded', () => {
   boxGrid = new BoxGrid('box-grid');
-	if (!localStorage.lastChildIndex) localStorage.setItem('lastChildIndex', 0);
+	if (localStorage.lastChildIndex === undefined) localStorage.setItem('lastChildIndex', 0);
 
 	//set default column count to 4, this is for browser opening up app for 1st time
 	let localColCount = localStorage.getItem('col-count') || 4;
